@@ -1,3 +1,4 @@
+import { beginBoundEdit } from './editors/binding.ts';
 import type { ClassifyResult, SourceLoc } from '../shared/protocol.ts';
 import * as api from './api.ts';
 import { beginExpressionEdit } from './editors/expression.ts';
@@ -135,6 +136,11 @@ export function initRouter(deps: RouterDeps): RouterHandle {
     if (deps.isNavigating()) {
       navigateThrough(e);
       return;
+    }
+
+    const bound = e.target instanceof Element ? e.target.closest<HTMLElement>('[data-dev-edit-file][data-dev-edit-path]') : null;
+    if (bound && !state.get()) {
+      e.preventDefault(); e.stopImmediatePropagation(); void beginBoundEdit(bound); return;
     }
 
     const el = nearestSource(e.target);

@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "@astrojs/compiler": "^2.13.1",
+    "@babel/parser": "^8.1.0",
     "launch-editor": "^2.14.1",
     "yaml": "^2.9.0"
   },

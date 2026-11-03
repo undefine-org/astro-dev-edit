@@ -379,3 +379,8 @@ export async function historyRequest<T>(path: string, payload?: unknown): Promis
   return res.json() as Promise<T>;
 }
 
+export async function bindingRequest<T>(action: 'read' | 'apply', payload: unknown): Promise<T> {
+  const res = await post(`/binding/${action}`, payload);
+  if (!res.ok) throw new Error(await errorMessage(res) ?? 'Source field request failed.');
+  return res.json() as Promise<T>;
+}

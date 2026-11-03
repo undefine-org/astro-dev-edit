@@ -1,3 +1,4 @@
+import { createBindingRoutes } from './bindings.ts';
 import { SourceHistory } from './history.ts';
 import { createHistoryRoutes } from './history-routes.ts';
 import { createTextWrites } from './text-writes.ts';
@@ -452,6 +453,7 @@ export function createMiddleware(deps: MiddlewareDeps): Connect.NextHandleFuncti
 
   const routes: Route[] = [
     ...createHistoryRoutes(history),
+    ...createBindingRoutes({ root, optionsResolver, writeText }),
     ...coreRoutes,
     ...createInspectRoutes({ logger, root, optionsResolver }),
     ...createPageSourceRoutes({ logger, optionsResolver, routeManifest }),
@@ -476,7 +478,7 @@ export function createMiddleware(deps: MiddlewareDeps): Connect.NextHandleFuncti
   ];
 
   const textMutationPaths = new Set([
-    '/apply', '/entry/apply', '/entry/create', '/entry/delete',
+    '/apply', '/binding/apply', '/entry/apply', '/entry/create', '/entry/delete',
     '/collection/schema/apply', '/collection/create', '/collection/page-editing', '/settings',
   ]);
   for (const route of routes) {
