@@ -210,3 +210,7 @@ Navigation to another route keeps normal browser behavior.
 The window event `astro-dev-edit:mode` carries `{ enabled: boolean }` when edit
 mode changes. A host can settle its own entrance motion while editing without
 changing the visitor experience.
+
+Literal conditional labels such as `{launched ? 'Buy' : 'Reserve'}` edit the
+currently rendered string branch. The condition and the other state remain
+unchanged. Computed branches or identical ambiguous labels are refused.

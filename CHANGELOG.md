@@ -16,6 +16,8 @@ Writing an entry — one line, past tense, no essay:
 
 ### Added
 
+- Allowed editing the current literal branch of conditional copy without changing its condition.
+
 - Published edit-mode changes as `astro-dev-edit:mode` for host preview behavior.
 
 - Allowed an explicitly configured authenticated loopback proxy user to edit from another device.

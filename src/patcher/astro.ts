@@ -1,3 +1,4 @@
+import { conditionalStrings } from './conditional.ts';
 import { parse } from '@astrojs/compiler';
 import type { AttrState, ClassifyResult } from '../shared/protocol.ts';
 import type { ApplyResult, Patcher, PatchRequest } from './types.ts';
@@ -444,6 +445,7 @@ function classifyResolved(
     return { kind: 'empty', reason: 'This element has no text content in the source.' };
   }
   if (hasExpressionDeep(el)) {
+    if (conditionalStrings(source, el)) return { kind: 'expression', reason: 'literal text for the current state', expression: { property: 'label', label: 'Current state' } };
     // A `{title}` or a `{b.title}` inside a `.map()` still renders words that
     // live in this file's frontmatter — traceable ones become editable through
     // the value popup; everything else keeps the refusal.
@@ -730,6 +732,13 @@ function patchExpression(
   original: string,
   newText: string,
 ): ApplyResult {
+  const choices = conditionalStrings(source, el);
+  if (choices) {
+    const matches = choices.filter(c => c.value === original);
+    if (matches.length !== 1) return { ok: false, code: 'ambiguous', error: 'This state label is stale or ambiguous.' };
+    const c = matches[0]; const text = c.quote + encodeLiteral(newText, c.quote) + c.quote;
+    return { ok: true, newSource: source.slice(0, c.from) + text + source.slice(c.to) };
+  }
   const trace = traceExpression(el, res.parents!);
   if (!trace || !res.frontmatter) {
     return {
