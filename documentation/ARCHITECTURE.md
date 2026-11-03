@@ -129,7 +129,7 @@ Theming is `--atx-*` plus a deliberately small `::part()` set (`bar`, `panel`, `
 
 ## Editing model
 
-Every save writes disk immediately and atomically. There is **no in-app undo** — the safety model is the user's git working tree. The verify-before-write step, where the server confirms the source still matches what the page showed, makes a stale click fail safe rather than corrupt the file. Both properties survive any change to the write path.
+Every save writes disk immediately and atomically. Saved source has persistent branching undo/redo and undoable Git source checkpoints; see [HISTORY.md](HISTORY.md). Git remains the publishing boundary. The verify-before-write step, where the server confirms the source still matches what the page showed, makes a stale click fail safe rather than corrupt the file. Both properties survive any change to the write path.
 
 ## Extending
 

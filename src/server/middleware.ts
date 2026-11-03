@@ -50,6 +50,7 @@ import { createUnsplashRoutes, type UnsplashConfig } from './unsplash-routes.ts'
 
 interface MiddlewareDeps {
   trustedProxyUser?: string;
+  refreshHistoryPreview?: () => void;
   logger: AstroIntegrationLogger;
   /** Project root (fsPath). Every served path is confined to this. */
   root: string;
@@ -461,7 +462,7 @@ export function createMiddleware(deps: MiddlewareDeps): Connect.NextHandleFuncti
   const detailRoutes = createDetailRoutes({ root, routeManifest });
 
   const routes: Route[] = [
-    ...createHistoryRoutes(history),
+    ...createHistoryRoutes(history, deps.refreshHistoryPreview),
     ...createBindingRoutes({ root, optionsResolver, writeText }),
     ...coreRoutes,
     ...createInspectRoutes({ logger, root, optionsResolver }),

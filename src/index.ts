@@ -178,6 +178,18 @@ export default function devEdit(userOptions: DevEditOptions = {}): AstroIntegrat
           createMiddleware({
             logger,
             root: projectRoot,
+            // Multi-file restores may remove and then recreate imports. Watcher
+            // events alone leave failed SSR imports cached after Undo. Clear
+            // every environment only once the complete transaction is on disk.
+            refreshHistoryPreview: () => {
+              for (const environment of Object.values(server.environments ?? {})) {
+                environment.moduleGraph.invalidateAll();
+                if ('runner' in environment) (environment as import('vite').RunnableDevEnvironment).runner.clearCache();
+                else environment.hot.send({ type: 'full-reload' });
+              }
+              server.moduleGraph.invalidateAll();
+              server.ws.send({ type: 'full-reload' });
+            },
             trustedProxyUser: userOptions.trustedProxyUser,
             publicDir,
             optionsResolver,

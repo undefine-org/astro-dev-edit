@@ -17,7 +17,7 @@ groups, so a Git restoration involving multiple files remains one undo step.
 
 History lists recent commits from the local Git repository. Choose a commit to
 review the source files it would add, change or delete, then Restore source.
-Restoration itself is undoable. It does not switch the branch, change HEAD,
+Restoration itself is undoable. After a history transition, the integration invalidates server and browser module caches so restored imports render again. It does not switch the branch, change HEAD,
 stage files, commit, push, install dependencies, or alter the Git index.
 
 The scope is supported text source files under `src/` and `public/`; repository

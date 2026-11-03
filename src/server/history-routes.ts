@@ -30,7 +30,7 @@ export async function checkpointFiles(history: SourceHistory, sha: string): Prom
   }
   return files;
 }
-export function createHistoryRoutes(history: SourceHistory): Route[] {
+export function createHistoryRoutes(history: SourceHistory, refreshPreview?: () => void): Route[] {
   const request = (body: unknown) => {
     const b = body as { revision?: number; sha?: string; id?: string; action?: string };
     if (!b || !Number.isSafeInteger(b.revision) || b.revision! < 0) throw Error('A current history revision is required.');
@@ -40,7 +40,8 @@ export function createHistoryRoutes(history: SourceHistory): Route[] {
     { method: 'GET', path: '/history', label: 'history', handler: async () => ({ status: 200, body: await history.view() }) },
     { method: 'POST', path: '/history/move', label: 'history move', handler: async body => {
       const b = request(body); if (!['undo', 'redo', 'jump'].includes(b.action)) throw Error('Unknown history action.');
-      return { status: 200, body: await history.move(b.action, b.revision, b.id) };
+      const result = await history.move(b.action, b.revision, b.id); refreshPreview?.();
+      return { status: 200, body: result };
     } },
     { method: 'GET', path: '/history/checkpoints', label: 'Git checkpoints', handler: async () => ({ status: 200, body: await checkpoints(history.root) }) },
     { method: 'POST', path: '/history/preview', label: 'checkpoint preview', handler: async body => {
@@ -56,7 +57,8 @@ export function createHistoryRoutes(history: SourceHistory): Route[] {
     { method: 'POST', path: '/history/restore', label: 'checkpoint restore', handler: async body => {
       const b = request(body); const files = await checkpointFiles(history, b.sha);
       const subject = (await git(history.root, ['show', '-s', '--format=%s', b.sha])).trim();
-      return { status: 200, body: await history.restore(files, b.revision, { sha: b.sha, subject }) };
+      const result = await history.restore(files, b.revision, { sha: b.sha, subject }); refreshPreview?.();
+      return { status: 200, body: result };
     } },
   ];
 }
