@@ -384,3 +384,8 @@ export async function bindingRequest<T>(action: 'read' | 'apply', payload: unkno
   if (!res.ok) throw new Error(await errorMessage(res) ?? 'Source field request failed.');
   return res.json() as Promise<T>;
 }
+
+export async function saveCopyAttribute(payload: unknown): Promise<void> {
+  const res = await post('/attribute/apply', payload);
+  if (!res.ok) throw new Error(await errorMessage(res) ?? 'Attribute save failed.');
+}

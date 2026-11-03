@@ -1,3 +1,4 @@
+import { initCopyFields } from './copy-fields.ts';
 import { initPreview } from './preview.ts';
 import { initHistory } from './history.ts';
 /**
@@ -58,6 +59,9 @@ if (document.body) {
 // ---------------------------------------------------------------------------
 
 let editMode = false;
+document.addEventListener('submit', event => {
+  if (editMode) { event.preventDefault(); event.stopImmediatePropagation(); }
+}, true);
 // Whether the element tree should be open while editing. The tree does NOT ride
 // along with edit mode — it stays closed until asked for (the bar's Elements
 // button or the panel's edge tab), so entering edit mode never covers the page
@@ -429,6 +433,7 @@ async function boot(): Promise<void> {
   // so a Settings save updates them in place. (see features.ts)
   setFeatures(info);
   initHistory(bar);
+  initCopyFields(bar);
   mount(
     ...hover.elements,
     tree.selectionOutline,

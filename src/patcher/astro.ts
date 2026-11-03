@@ -661,7 +661,7 @@ function patchAttribute(
   source: string,
   starts: number[],
   el: AstNode,
-  attrName: 'src' | 'alt',
+  attrName: string,
   original: string,
   newValue: string,
 ): ApplyResult {
@@ -790,3 +790,11 @@ export const astroPatcher: Patcher = {
   classify: (source, { loc, tag }) => classifyAstro(source, loc, tag),
   apply: applyAstro,
 };
+
+/** Static copy attributes are an inspector operation, never arbitrary props. */
+export async function applyCopyAttribute(source: string, req: { loc: string; tag: string; attribute: string; original: string; value: string }): Promise<ApplyResult> {
+  if (!['placeholder', 'title', 'aria-label', 'alt'].includes(req.attribute)) return { ok: false, code: 'unsupported', error: 'Only copy attributes are editable here.' };
+  const resolved = await resolveElement(source, req.loc, req.tag);
+  if (resolved.status !== 'ok') return { ok: false, code: resolved.status, error: 'Source location is stale or ambiguous.' };
+  return patchAttribute(source, lineStartIndices(source), resolved.element!, req.attribute, req.original, req.value);
+}

@@ -1716,6 +1716,7 @@ input[type='checkbox'].atx-switch:disabled {
   display: none;
 }
 
+.atx-copy-field { display: block; width: 100%; text-align: left; white-space: normal; margin-block: 4px; }
 .atx-history-row { margin-block: 5px; }
 .atx-history-row button { max-width: 100%; white-space: normal; text-align: left; }
 .atx-history-heading { font-size: 14px; margin: 20px 0 10px; }

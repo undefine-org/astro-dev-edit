@@ -1,3 +1,4 @@
+import { applyCopyAttribute } from '../patcher/astro.ts';
 import { createBindingRoutes } from './bindings.ts';
 import { SourceHistory } from './history.ts';
 import { createHistoryRoutes } from './history-routes.ts';
@@ -170,6 +171,19 @@ export function createMiddleware(deps: MiddlewareDeps): Connect.NextHandleFuncti
   });
 
   const coreRoutes: Route[] = [
+    {
+      method: 'POST', path: '/attribute/apply', label: 'copy attribute', maxBytes: 256 * 1024,
+      handler: async body => {
+        const b = body as { file: string; loc: string; tag: string; attribute: string; original: string; value: string };
+        if (!b || ['file', 'loc', 'tag', 'attribute', 'original', 'value'].some(k => typeof (b as any)[k] !== 'string')) throw Error('A source location and copy attribute are required.');
+        const o = await opts();
+        const file = await validateEditablePath(root, o.contentRoots, ['.astro'], b.file);
+        const source = await readFile(file, 'utf8'); const result = await applyCopyAttribute(source, b);
+        if (!result.ok) return { status: 422, body: { error: result.error } };
+        await writeText(file, result.newSource, source); return { status: 200, body: { ok: true } };
+      },
+    },
+
     {
       method: 'GET',
       path: '/health',
@@ -478,7 +492,7 @@ export function createMiddleware(deps: MiddlewareDeps): Connect.NextHandleFuncti
   ];
 
   const textMutationPaths = new Set([
-    '/apply', '/binding/apply', '/entry/apply', '/entry/create', '/entry/delete',
+    '/apply', '/attribute/apply', '/binding/apply', '/entry/apply', '/entry/create', '/entry/delete',
     '/collection/schema/apply', '/collection/create', '/collection/page-editing', '/settings',
   ]);
   for (const route of routes) {
