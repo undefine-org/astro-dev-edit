@@ -26,3 +26,6 @@ examples/airbnb/
 examples/sf-sf/
 examples/01-example-site-2/
 examples/astro-cloudflare-starter/
+
+# Local source undo tree; never publish project content snapshots.
+.astro-dev-edit-history/

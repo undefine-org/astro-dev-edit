@@ -1,3 +1,5 @@
+import { SourceHistory } from './history.ts';
+import { createHistoryRoutes } from './history-routes.ts';
 import { createTextWrites } from './text-writes.ts';
 import type { AstroIntegrationLogger } from 'astro';
 import { readFile } from 'node:fs/promises';
@@ -145,7 +147,8 @@ function isLocalRequest(req: Connect.IncomingMessage): boolean {
 export function createMiddleware(deps: MiddlewareDeps): Connect.NextHandleFunction {
   const { logger, root, optionsResolver, routeManifest, schemaProvider, unsplash } = deps;
   const publicDir = deps.publicDir ?? 'public';
-  const textWrites = createTextWrites({ root, optionsResolver, logger });
+  const history = new SourceHistory(root);
+  const textWrites = createTextWrites({ root, optionsResolver, logger, history });
   const writeText = textWrites.write;
 
   /** The effective options for the request in hand. Every handler starts here
@@ -448,6 +451,7 @@ export function createMiddleware(deps: MiddlewareDeps): Connect.NextHandleFuncti
   const detailRoutes = createDetailRoutes({ root, routeManifest });
 
   const routes: Route[] = [
+    ...createHistoryRoutes(history),
     ...coreRoutes,
     ...createInspectRoutes({ logger, root, optionsResolver }),
     ...createPageSourceRoutes({ logger, optionsResolver, routeManifest }),

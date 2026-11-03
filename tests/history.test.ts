@@ -1,0 +1,64 @@
+import { beforeEach, afterEach, it, expect } from 'vitest';
+import { mkdtemp, mkdir, writeFile, readFile, rm, symlink } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { SourceHistory } from '../src/server/history.ts';
+import { checkpointFiles } from '../src/server/history-routes.ts';
+import { isPrivateFileRequest } from '../src/server/private-files.ts';
+let root: string;
+beforeEach(async () => { root = await mkdtemp(join(tmpdir(), 'source-history-')); await mkdir(join(root, 'src')); await writeFile(join(root, 'src/a.astro'), '<p>First</p>'); });
+afterEach(async () => { await rm(root, { recursive: true, force: true }); });
+const text = () => readFile(join(root, 'src/a.astro'), 'utf8');
+it('persists cursor and branching redo across server instances', async () => {
+  let h = new SourceHistory(root); await h.view();
+  await h.write('src/a.astro', '<p>Second</p>', '<p>First</p>');
+  let v = await h.view(); const second = v.cursor;
+  v = await h.move('undo', v.revision); expect(await text()).toBe('<p>First</p>');
+  await h.write('src/a.astro', '<p>Alternative</p>', '<p>First</p>');
+  h = new SourceHistory(root); v = await h.view(); const alternative = v.cursor;
+  v = await h.move('undo', v.revision); expect(v.redo).toHaveLength(2);
+  v = await h.move('redo', v.revision, second); expect(await text()).toBe('<p>Second</p>');
+  await h.move('jump', v.revision, alternative); expect(await text()).toBe('<p>Alternative</p>');
+});
+it('refuses stale browser commands and preserves external edits as a boundary', async () => {
+  const h = new SourceHistory(root); const old = await h.view();
+  await writeFile(join(root, 'src/a.astro'), '<p>Outside</p>');
+  await expect(h.move('undo', old.revision)).rejects.toThrow('History changed');
+  expect(await text()).toBe('<p>Outside</p>');
+  const v = await h.view(); expect(v.nodes.at(-1)?.label).toBe('Changes outside editor');
+});
+it('restores a Git source snapshot as one nested, undoable transaction without changing branch or index', async () => {
+  const git = (...args: string[]) => execFileSync('git', ['-C', root, ...args], { encoding: 'utf8' }).trim();
+  git('init', '-q'); git('config', 'user.email', 'test@example.test'); git('config', 'user.name', 'Test'); git('add', 'src'); git('commit', '-qm', 'First'); const first = git('rev-parse', 'HEAD');
+  await writeFile(join(root, 'src/a.astro'), '<p>Second</p>'); await writeFile(join(root, 'src/b.ts'), 'export const title = "New";');
+  git('add', 'src'); git('commit', '-qm', 'Second'); const head = git('rev-parse', 'HEAD'); const index = git('write-tree');
+  const h = new SourceHistory(root); let v = await h.view();
+  v = await h.restore(await checkpointFiles(h, first), v.revision, { sha: first, subject: 'First' });
+  expect(await text()).toBe('<p>First</p>'); await expect(readFile(join(root, 'src/b.ts'))).rejects.toThrow();
+  const state = JSON.parse(await readFile(join(root, '.astro-dev-edit-history/state.json'), 'utf8'));
+  expect(state.nodes.at(-1).group.children).toHaveLength(2);
+  await new SourceHistory(root).move('undo', v.revision);
+  expect(await text()).toBe('<p>Second</p>'); expect(await readFile(join(root, 'src/b.ts'), 'utf8')).toContain('New');
+  expect(git('rev-parse', 'HEAD')).toBe(head); expect(git('write-tree')).toBe(index);
+});
+it('rejects source symlinks, stale source values, and private history HTTP paths', async () => {
+  const h = new SourceHistory(root); await h.view();
+  await expect(h.write('src/a.astro', 'changed', 'stale')).rejects.toThrow('source changed');
+  await symlink(join(root, 'src/a.astro'), join(root, 'src/link.astro'));
+  await expect(h.current('src/link.astro')).rejects.toThrow('symbolic');
+  expect(isPrivateFileRequest('/@fs/project/.astro-dev-edit-history/objects/123?raw')).toBe(true);
+  await expect(h.current('../secrets.json')).rejects.toThrow('content roots');
+});
+it('recovers an interrupted multi-file journal and never overwrites conflicting external work', async () => {
+  const h = new SourceHistory(root); await h.view();
+  const before = await h.object('<p>First</p>'); const after = await h.object('<p>Recovered</p>');
+  const statePath = join(root, '.astro-dev-edit-history/state.json'); const state = JSON.parse(await readFile(statePath, 'utf8'));
+  state.revision++;
+  const pending = join(root, '.astro-dev-edit-history/pending.json');
+  await writeFile(pending, JSON.stringify({ state, changes: [{ file: 'src/a.astro', before, after }] }));
+  await new SourceHistory(root).view(); expect(await text()).toBe('<p>Recovered</p>');
+  await writeFile(pending, JSON.stringify({ state, changes: [{ file: 'src/a.astro', before, after }] }));
+  await writeFile(join(root, 'src/a.astro'), 'Someone else');
+  await expect(new SourceHistory(root).view()).rejects.toThrow('conflicts'); expect(await text()).toBe('Someone else');
+});

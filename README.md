@@ -1,3 +1,5 @@
+> **Undefine fork** of [Jan Cerny's astro-dev-edit](https://github.com/janjcwebtech/astro-dev-edit), under the original MIT license. Development follows `undefine-org/astro-dev-edit`; see [persistent source history](documentation/HISTORY.md). Install a pinned public GitHub archive for reproducible builds.
+
 <div align="center">
 
 <img src="https://raw.githubusercontent.com/janjcwebtech/astro-dev-edit/main/documentation/images/banner.webp" alt="VS Code with the playground site in the editor pane: the hover pill reads index.astro:22:13 editable, with open and copy buttons, above a heading selected for inline editing, and the matching h1 highlighted in the source on the right" width="820">

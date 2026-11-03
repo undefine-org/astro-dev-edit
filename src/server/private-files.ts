@@ -28,7 +28,7 @@ import type { Connect, Plugin as VitePlugin } from 'vite';
  */
 
 /** Fixed filenames, never client-supplied. Add a file here to make it unservable. */
-const PRIVATE_FILES: readonly string[] = ['.astro-dev-edit.json'];
+const PRIVATE_FILES: readonly string[] = ['.astro-dev-edit.json', '.astro-dev-edit-history'];
 
 /**
  * `atomicWrite`'s mid-write sibling, `.<basename>.dev-edit-tmp-<pid>`

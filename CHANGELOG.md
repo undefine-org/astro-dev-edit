@@ -16,6 +16,8 @@ Writing an entry — one line, past tense, no essay:
 
 ### Added
 
+- Added persistent branching source history, nested undo groups and undoable Git source checkpoints.
+
 - Data collections — `.json`, `.yml` and `.yaml` entries — are listed and counted instead of reporting `0 entries`. They are not editable yet: the row says why, detail pages don't offer **Edit entry** for one, and `POST /entry` refuses one in words. `editableExtensions` no longer gates them, so no configuration can hide a data entry.
 
 ### Fixed

@@ -1,5 +1,6 @@
 import { readFile, realpath } from 'node:fs/promises';
-import { basename, dirname } from 'node:path';
+import { basename, dirname, relative, sep } from 'node:path';
+import type { SourceHistory } from './history.ts';
 import { launchInEditor } from './editor.ts';
 import type { OptionsResolver, ResolvedOptions } from './options.ts';
 import { atomicWrite, insideRoot } from './paths.ts';
@@ -42,6 +43,7 @@ async function contents(target: string): Promise<string | null> {
  *  that writes both `.env.local` and the settings file. */
 export function createTextWrites(deps: {
   root: string;
+  history?: SourceHistory;
   optionsResolver: OptionsResolver;
   logger: { warn(message: string): void };
   launch?: (spec: string, onError?: () => void) => Promise<void>;
@@ -87,7 +89,9 @@ export function createTextWrites(deps: {
         await contents(target) !== before) {
       throw new Error('file changed on disk before saving; reopen it and try again');
     }
-    await atomicWrite(target, content, mode);
+    const file = relative(deps.root, target).split(sep).join('/');
+    if (deps.history?.eligible(file)) await deps.history.write(file, content, before);
+    else await atomicWrite(target, content, mode);
     if (options.revealWrites && before === null) await reveal(target, 1);
   };
 
