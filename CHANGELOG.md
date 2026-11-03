@@ -16,6 +16,8 @@ Writing an entry — one line, past tense, no essay:
 
 ### Added
 
+- Published edit-mode changes as `astro-dev-edit:mode` for host preview behavior.
+
 - Allowed an explicitly configured authenticated loopback proxy user to edit from another device.
 
 - Added searchable Copy fields for shared values, hidden messages and static copy attributes.

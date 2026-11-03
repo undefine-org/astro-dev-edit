@@ -206,3 +206,7 @@ element on the page highlights its row and scrolls the tree to it.
 
 While editing, source refreshes restore the scroll position on the same route.
 Navigation to another route keeps normal browser behavior.
+
+The window event `astro-dev-edit:mode` carries `{ enabled: boolean }` when edit
+mode changes. A host can settle its own entrance motion while editing without
+changing the visitor experience.

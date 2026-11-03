@@ -129,6 +129,7 @@ function rememberTree(open: boolean): void {
 
 function setEditMode(on: boolean): void {
   editMode = on;
+  window.dispatchEvent(new CustomEvent('astro-dev-edit:mode', { detail: { enabled: on } }));
   if (!on) setNavigating(false);
   refreshCursor();
   // Survive the full-page reload that follows every successful save.
