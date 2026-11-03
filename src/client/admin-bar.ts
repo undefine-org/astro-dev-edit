@@ -602,6 +602,13 @@ export function initAdminBar(deps: AdminBarDeps): AdminBarHandle {
     onSelect: () => deps.openSettings(),
   });
 
+  for (const item of [
+    { id: 'elements', label: 'Elements', icon: 'sidebar' as const, onSelect: () => deps.showTree() },
+    { id: 'entry', label: 'Edit entry', icon: 'file' as const, visible: () => deps.hasEntry(), onSelect: () => deps.openEntry() },
+    { id: 'pin', label: 'Pin / unpin bar', icon: 'pin' as const, onSelect: () => setPinned(!prefs.pinned) },
+    { id: 'edge', label: 'Move bar', icon: 'panelBottom' as const, onSelect: () => setEdge(prefs.edge === 'top' ? 'bottom' : 'top') },
+  ]) register({ ...item, id: `atx-menu-${item.id}`, place: 'menu' });
+
   // The exit button's whole point is to track the save state, so the bar
   // repaints on every phase change.
   state.onSavePhase(() => refresh());

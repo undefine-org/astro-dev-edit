@@ -129,6 +129,9 @@ editor to (near) the rule; rules from cross-origin/CDN stylesheets or an inline
 
 ## The admin bar
 
+On narrow screens, the bar keeps editing and save controls visible. Elements,
+entry editing, pinning and docking remain in the launcher menu.
+
 Every global control lives in a slim bar across the top of the page:
 
 - **Elements** — show or hide the [element tree](#element-tree), which edit mode

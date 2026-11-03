@@ -1716,6 +1716,17 @@ input[type='checkbox'].atx-switch:disabled {
   display: none;
 }
 
+/* Keep the editing action and save state readable on a phone. Secondary
+   actions remain available in the launcher's menu. */
+@media (max-width: 600px) {
+  .atx-bar { gap: 4px; padding-inline: 4px; }
+  .atx-bar-group { gap: 4px; }
+  .atx-bar-hint[data-on], .atx-bar-sep,
+  #atx-bar-elements, #atx-entry, #atx-bar-pin, #atx-bar-edge { display: none; }
+  #atx-bar-exit { min-width: 72px !important; padding-inline: 8px; }
+  .atx-bar-btn { padding-inline: 8px; }
+}
+
 .atx-menu {
   position: fixed;
   z-index: ${Z + 4};
