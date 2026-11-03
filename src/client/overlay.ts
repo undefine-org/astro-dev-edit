@@ -1,3 +1,4 @@
+import { initHistory } from './history.ts';
 /**
  * astro-dev-edit overlay — injected browser client (composition root).
  *
@@ -426,6 +427,7 @@ async function boot(): Promise<void> {
   // so the media modal can see them without importing the composition root and
   // so a Settings save updates them in place. (see features.ts)
   setFeatures(info);
+  initHistory(bar);
   mount(
     ...hover.elements,
     tree.selectionOutline,

@@ -370,3 +370,12 @@ export async function createCollection(
 ): Promise<CollectionCreateResponse> {
   return collectionPost<CollectionCreateResponse>('/collection/create', req);
 }
+
+
+// Source history lives on the local dev server, not in browser storage.
+export async function historyRequest<T>(path: string, payload?: unknown): Promise<T> {
+  const res = payload === undefined ? await fetch(`${API}/history${path}`) : await post(`/history${path}`, payload);
+  if (!res.ok) throw new Error(await errorMessage(res) ?? 'History request failed.');
+  return res.json() as Promise<T>;
+}
+

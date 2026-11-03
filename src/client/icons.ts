@@ -23,6 +23,7 @@ import { styled } from "./ui.ts";
  */
 
 export type IconName =
+  | "undo" | "redo" | "history"
   | "cursor"
   | "pencil"
   | "file"
@@ -54,6 +55,9 @@ export type IconName =
 
 /** Path geometry only — the wrapper `<svg>` supplies stroke, width and caps. */
 const PATHS: Record<IconName, string> = {
+  undo: '<path d="M3 10h11a7 7 0 0 1 0 14" transform="translate(0 -5)"/><path d="m7 1-4 4 4 4"/>',
+  redo: '<path d="M21 5H10a7 7 0 0 0 0 14"/><path d="m17 1 4 4-4 4"/>',
+  history: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5m4 0v5l3 2"/>',
   // The overlay's own mark: a click-to-edit pointer. Lucide's `mouse-pointer-2`
   // filled — this one is an identity rather than a glyph in a row, and the
   // solid arrow holds up at the 14px the toggle draws it at.

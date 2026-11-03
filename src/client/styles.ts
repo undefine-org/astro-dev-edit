@@ -1716,6 +1716,13 @@ input[type='checkbox'].atx-switch:disabled {
   display: none;
 }
 
+.atx-history-row { margin-block: 5px; }
+.atx-history-row button { max-width: 100%; white-space: normal; text-align: left; }
+.atx-history-heading { font-size: 14px; margin: 20px 0 10px; }
+.atx-history-status { font-size: 13px; color: var(--atx-muted-fg); }
+.atx-history-select { width: 100%; box-sizing: border-box; padding: 10px; color: var(--atx-foreground); background: var(--atx-input); border: 1px solid var(--atx-border); border-radius: 8px; }
+.atx-history-file { font: 12px/1.5 var(--atx-font-mono); overflow-wrap: anywhere; margin-block: 4px; }
+
 /* Keep the editing action and save state readable on a phone. Secondary
    actions remain available in the launcher's menu. */
 @media (max-width: 600px) {
