@@ -178,6 +178,7 @@ export default function devEdit(userOptions: DevEditOptions = {}): AstroIntegrat
           createMiddleware({
             logger,
             root: projectRoot,
+            trustedProxyUser: userOptions.trustedProxyUser,
             publicDir,
             optionsResolver,
             // Always constructed: the entry editor can now be switched on from

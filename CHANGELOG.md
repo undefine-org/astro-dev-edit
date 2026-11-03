@@ -16,6 +16,8 @@ Writing an entry — one line, past tense, no essay:
 
 ### Added
 
+- Allowed an explicitly configured authenticated loopback proxy user to edit from another device.
+
 - Added searchable Copy fields for shared values, hidden messages and static copy attributes.
 
 - Added explicit source bindings for shared TypeScript strings, Astro prop defaults and transformed sentences.

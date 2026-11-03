@@ -35,6 +35,9 @@ import { readStoredOptions } from './settings.ts';
 
 /** Options a consuming project passes to `devEdit()`. */
 export interface DevEditOptions {
+  /** Opt in to an authenticated loopback reverse proxy. It must overwrite the
+   * tailscale-user-login header; only this principal can use remote endpoints. */
+  trustedProxyUser?: string;
   /** Kill switch. When false the integration does nothing at all. */
   enabled?: boolean;
   /** Directories scanned for replacement images offered in the swap panel. */
@@ -143,7 +146,7 @@ export interface UnsplashOptions {
 }
 
 /** Every option's effective value for one request — no optionals left. */
-export type ResolvedOptions = Required<DevEditOptions>;
+export type ResolvedOptions = Required<Omit<DevEditOptions, 'trustedProxyUser'>>;
 
 /**
  * What the Settings panel stores. `Partial<DevEditOptions>` for every option

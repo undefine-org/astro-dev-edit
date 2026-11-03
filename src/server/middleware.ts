@@ -49,6 +49,7 @@ import { createUnsplashRoutes, type UnsplashConfig } from './unsplash-routes.ts'
  */
 
 interface MiddlewareDeps {
+  trustedProxyUser?: string;
   logger: AstroIntegrationLogger;
   /** Project root (fsPath). Every served path is confined to this. */
   root: string;
@@ -125,25 +126,19 @@ async function hasUnsplashKey(cfg: UnsplashConfig | null): Promise<boolean> {
 }
 
 /** Reject anything that isn't a same-machine request. (spec §8) */
-function isLocalRequest(req: Connect.IncomingMessage): boolean {
-  const remote = req.socket.remoteAddress ?? '';
-  const localAddrs = ['127.0.0.1', '::1', '::ffff:127.0.0.1'];
-  if (!localAddrs.includes(remote)) return false;
-
-  // If an Origin header is present it must be a localhost origin — this blocks
-  // a page on another site from POSTing to our dev endpoints via the browser.
-  const origin = req.headers.origin;
-  if (origin) {
-    try {
-      const host = new URL(origin).hostname;
-      if (host !== 'localhost' && host !== '127.0.0.1' && host !== '[::1]') {
-        return false;
-      }
-    } catch {
-      return false;
-    }
-  }
-  return true;
+export function isLocalRequest(req: Connect.IncomingMessage, trustedProxyUser?: string): boolean {
+  if (!['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress ?? '')) return false;
+  try {
+    const host = new URL(`http://${req.headers.host ?? 'localhost'}`);
+    const local = ['localhost', '127.0.0.1', '[::1]'].includes(host.hostname);
+    const trusted = !!trustedProxyUser && req.headers['tailscale-user-login'] === trustedProxyUser;
+    if (!local && !trusted) return false;
+    if (!req.headers.origin) return true;
+    const origin = new URL(req.headers.origin);
+    return local
+      ? ['localhost', '127.0.0.1', '[::1]'].includes(origin.hostname)
+      : trusted && origin.protocol === 'https:' && origin.host === host.host;
+  } catch { return false; }
 }
 
 export function createMiddleware(deps: MiddlewareDeps): Connect.NextHandleFunction {
@@ -507,7 +502,7 @@ export function createMiddleware(deps: MiddlewareDeps): Connect.NextHandleFuncti
       next();
       return;
     }
-    if (!isLocalRequest(req)) {
+    if (!isLocalRequest(req, deps.trustedProxyUser)) {
       json(res, 403, { error: 'text-edit endpoints accept localhost requests only' });
       return;
     }
