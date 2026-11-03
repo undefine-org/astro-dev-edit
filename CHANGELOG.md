@@ -32,6 +32,8 @@ Writing an entry — one line, past tense, no essay:
 
 ### Fixed
 
+- Docked the phone toolbar below page navigation unless a saved preference overrides it.
+
 - Restored the reading position after source saves refreshed the current route.
 
 - Kept the phone toolbar compact with secondary actions available in its menu.

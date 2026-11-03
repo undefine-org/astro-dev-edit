@@ -94,7 +94,7 @@ Every option, with its default and what it does: [Configuration reference](https
 
 ## Limits
 
-- No undo and no edit history. Every save writes the file immediately, so your git tree is the safety net: start from a clean tree, review with `git diff`, discard with `git checkout <file>`. Writes are atomic and verified against what the page showed, so a stale click fails rather than corrupting the file.
+- Persistent source undo/redo, alternate branches and Git source checkpoints are described in [HISTORY.md](documentation/HISTORY.md). Settings and credentials stay outside source history.
 - Content, never structure. Inline edited text is escaped so it cannot introduce a tag, an expression or an entity. The markup popup lets tags through, but only the inline safelist, only with presentational attributes, and only well nested.
 - The rich body editor covers a markdown subset. Anything past it, so tables, raw HTML or MDX, footnotes and nested lists, stays editable as markdown source.
 - The collection designer reads only the schema shapes it can prove: `schema: z.object({ … })` and `schema: ({ image }) => z.object({ … })` with a plain field list. Anything else is reported as unreadable, with _Open source_ offered instead.

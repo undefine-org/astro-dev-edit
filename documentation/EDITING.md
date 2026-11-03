@@ -129,7 +129,7 @@ editor to (near) the rule; rules from cross-origin/CDN stylesheets or an inline
 
 ## The admin bar
 
-On narrow screens, the bar keeps editing and save controls visible. Elements,
+On narrow screens, a fresh toolbar docks below the page by default and keeps editing and save controls visible. Saved docking preferences still take precedence. Elements,
 entry editing, pinning and docking remain in the launcher menu.
 
 Every global control lives in a slim bar across the top of the page:

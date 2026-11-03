@@ -155,9 +155,10 @@ const PREFS_KEY = 'astroDevEditBar';
 const DEFAULT_PREFS: BarPrefs = { edge: 'top', pinned: true };
 
 function loadPrefs(): BarPrefs {
+  const defaults: BarPrefs = { ...DEFAULT_PREFS, edge: innerWidth <= 600 ? 'bottom' : 'top' };
   try {
     const raw = localStorage.getItem(PREFS_KEY);
-    if (!raw) return { ...DEFAULT_PREFS };
+    if (!raw) return defaults;
     const parsed = JSON.parse(raw) as Partial<BarPrefs>;
     return {
       edge: parsed.edge === 'bottom' ? 'bottom' : 'top',
@@ -165,7 +166,7 @@ function loadPrefs(): BarPrefs {
     };
   } catch {
     // No localStorage (or junk in it) — the defaults are fine.
-    return { ...DEFAULT_PREFS };
+    return defaults;
   }
 }
 
