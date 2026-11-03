@@ -1,3 +1,4 @@
+import { initPreview } from './preview.ts';
 import { initHistory } from './history.ts';
 /**
  * astro-dev-edit overlay — injected browser client (composition root).
@@ -456,6 +457,7 @@ async function boot(): Promise<void> {
 
   // Creating an entry reloads the page for the same reason, while the create
   // is still waiting for the new route to answer. Pick that wait back up.
+  initPreview();
   resumePendingNavigation();
 
   // A schema write reloads the page (Astro resyncs its content layer), which

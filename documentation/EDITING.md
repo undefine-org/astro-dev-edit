@@ -201,3 +201,8 @@ element on the page highlights its row and scrolls the tree to it.
 - Leaving edit mode hides it. Closing it with its ✕ while still editing leaves the left-edge tab that brings it back, as does **Elements** on the bar.
 - Whether it was open is remembered for the session, so a save-triggered reload restores it the way you left it.
 
+
+### Preview position
+
+While editing, source refreshes restore the scroll position on the same route.
+Navigation to another route keeps normal browser behavior.

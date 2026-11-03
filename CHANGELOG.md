@@ -24,6 +24,8 @@ Writing an entry — one line, past tense, no essay:
 
 ### Fixed
 
+- Restored the reading position after source saves refreshed the current route.
+
 - Kept the phone toolbar compact with secondary actions available in its menu.
 
 - A collection whose glob loader pairs a broad `base` with a narrow `pattern` — `glob({ pattern: 'settings.yml', base: './src/content' })` — no longer claims every file beneath that base as its own. The loader's `pattern` is read alongside its `base` and both are honoured; a pattern using anything beyond `**`, `*`, `?` and `{a,b}` is not read, and entries fall back to matching on extension. This affected 0.12.0 only.
